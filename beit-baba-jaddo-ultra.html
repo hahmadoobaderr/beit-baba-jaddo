@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بيت بابا جدو | النسخة العائلية التجريبية</title>
+  <style>
+    :root {
+      --bg1:#120c56; --bg2:#7b1e7a; --bg3:#ffb703;
+      --card:#111936; --card2:#1a2450; --gold:#ffd166; --cyan:#6ee7ff;
+      --red:#ff5d73; --green:#20c997; --muted:#bac4e2; --ink:#0f172a;
+      --shadow:0 14px 30px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:#fff; font-family:"Segoe UI",Tahoma,sans-serif;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2) 48%,var(--bg3));
+      min-height:100vh;
+    }
+    .hidden{display:none!important}
+    .screen{min-height:100vh; padding:22px}
+    .wrap{max-width:1280px; margin:auto}
+    .hero{background:rgba(10,14,33,.58); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,.14); border-radius:28px; box-shadow:var(--shadow); padding:28px}
+    h1,h2,h3,p{margin:0}
+    .title{font-size:clamp(2rem,4vw,4rem); color:var(--gold); text-shadow:0 4px 20px rgba(0,0,0,.25)}
+    .sub{color:#f8f9ff; opacity:.92; margin-top:10px; font-size:1.05rem}
+    .setup-grid{display:grid; grid-template-columns:1.25fr .95fr; gap:18px; margin-top:18px}
+    .panel{background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.15); border-radius:22px; padding:18px}
+    .panel h3{margin-bottom:10px; color:var(--gold)}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .field{display:flex; flex-direction:column; gap:8px; margin-bottom:12px}
+    label{color:#eef2ff; font-size:.95rem}
+    input, select{
+      width:100%; border:none; outline:none; border-radius:14px; padding:14px 15px;
+      background:#f8fafc; color:#0f172a; font-size:1rem;
+    }
+    .chips{display:flex; flex-wrap:wrap; gap:10px}
+    .chip{
+      padding:11px 16px; border-radius:999px; border:1px solid rgba(255,255,255,.28);
+      background:rgba(255,255,255,.08); cursor:pointer; transition:.2s transform,.2s background,.2s border-color;
+      user-select:none
+    }
+    .chip.active{background:var(--gold); color:#111; border-color:var(--gold); font-weight:700}
+    .actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:14px}
+    button{
+      border:none; cursor:pointer; border-radius:16px; padding:14px 18px; font-weight:800; font-size:1rem;
+      transition:.18s transform,.18s opacity,.18s filter; box-shadow:var(--shadow)
+    }
+    button:hover{transform:translateY(-2px)}
+    button:active{transform:translateY(1px)}
+    .btn-primary{background:linear-gradient(135deg,var(--gold),#ff9f1c); color:#111}
+    .btn-secondary{background:linear-gradient(135deg,#6ee7ff,#48bfe3); color:#08111f}
+    .btn-danger{background:linear-gradient(135deg,#ff5d73,#d90429); color:#fff}
+    .btn-dark{background:#18213f; color:#fff; border:1px solid rgba(255,255,255,.16)}
+    .tiny{font-size:.88rem; color:#e9ecff; opacity:.85; margin-top:10px}
+
+    .topbar{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px}
+    .brand{display:flex; align-items:center; gap:12px}
+    .pill{background:rgba(255,255,255,.12); padding:10px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.15)}
+    .controls{display:flex; gap:8px; flex-wrap:wrap}
+
+    .scoreboard{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px}
+    .team{
+      background:rgba(9,15,36,.62); border:1px solid rgba(255,255,255,.15); border-radius:24px; padding:18px; position:relative; overflow:hidden;
+    }
+    .team::before{content:""; position:absolute; inset:0 auto 0 0; width:7px}
+    .team.red::before{background:var(--red)}
+    .team.blue::before{background:var(--cyan)}
+    .team-head{display:flex; justify-content:space-between; align-items:center; gap:12px}
+    .score{font-size:clamp(2rem,4vw,4rem); font-weight:900; color:#fff}
+    .meta{color:var(--muted); font-size:.95rem; margin-top:6px}
+
+    .grid{display:grid; gap:12px}
+    .cell-head,.cell{
+      min-height:96px; display:flex; align-items:center; justify-content:center; text-align:center; border-radius:18px; padding:12px;
+      box-shadow:var(--shadow)
+    }
+    .cell-head{
+      background:rgba(7,12,28,.75); color:var(--gold); font-weight:900; font-size:1.05rem; border:1px solid rgba(255,255,255,.14)
+    }
+    .cell{
+      background:linear-gradient(160deg,#0d1b52,#142b7e 45%,#07153f);
+      border:2px solid rgba(110,231,255,.36); color:var(--gold); font-size:2rem; font-weight:900; cursor:pointer;
+      transition:.18s transform,.18s filter,.18s border-color;
+    }
+    .cell:hover{transform:scale(1.03); border-color:#fff}
+    .cell.done{opacity:.18; filter:grayscale(1); cursor:not-allowed; transform:none}
+    .cell.daily{box-shadow:0 0 0 2px rgba(255,209,102,.35), var(--shadow)}
+
+    #popup{position:fixed; inset:0; background:rgba(4,8,20,.82); display:none; align-items:center; justify-content:center; padding:18px; z-index:50}
+    .modal{
+      width:min(980px,100%); background:#fff; color:var(--ink); border-radius:30px; overflow:hidden; box-shadow:0 24px 70px rgba(0,0,0,.45)
+    }
+    .modal-top{padding:20px 24px; background:linear-gradient(135deg,#151f47,#273c75); color:#fff}
+    .modal-top h2{font-size:1.8rem}
+    .flag{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.12); margin-bottom:10px}
+    .modal-body{padding:22px 24px}
+    .task{font-size:clamp(1.5rem,2.5vw,2.2rem); line-height:1.6; font-weight:900; color:#152449; margin-bottom:16px}
+    .hint{font-size:1rem; color:#475569; background:#f8fafc; border-radius:16px; padding:12px 14px; border:1px solid #e2e8f0; margin-bottom:14px}
+    .timer-wrap{background:#e5e7eb; border-radius:999px; height:14px; overflow:hidden; margin:10px 0 8px}
+    .timer-fill{height:100%; width:100%; background:linear-gradient(90deg,#20c997,#ffd166,#ff5d73); transition:width 1s linear}
+    .timer-text{font-weight:800; color:#334155; margin-bottom:12px}
+    .modal-actions{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px}
+    .award{padding:16px 12px; border-radius:16px; font-size:1rem}
+    .award.red{background:linear-gradient(135deg,#ff7b8a,#d90429); color:#fff}
+    .award.blue{background:linear-gradient(135deg,#6ee7ff,#0ea5e9); color:#062033}
+    .award.gray{background:#e2e8f0; color:#0f172a}
+    .award.green{background:linear-gradient(135deg,#b7f7d2,#20c997); color:#073b2d}
+    .admin-tools{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    .small{padding:11px 14px; border-radius:12px; box-shadow:none}
+
+    .final{display:grid; place-items:center; text-align:center; min-height:70vh}
+    .winner-card{background:rgba(10,14,33,.62); border:1px solid rgba(255,255,255,.15); border-radius:30px; padding:36px; max-width:760px; width:100%; box-shadow:var(--shadow)}
+    .winner-card .big{font-size:clamp(2rem,4vw,4.3rem); color:var(--gold); margin-bottom:12px}
+    .winner-score{font-size:1.5rem; color:#fff; margin:10px 0 18px}
+    .summary{display:grid; grid-template-columns:1fr 1fr; gap:14px; text-align:right; margin:20px 0}
+    .summary .panel{padding:16px}
+
+    .toast{position:fixed; bottom:18px; left:18px; background:#08111f; color:#fff; padding:12px 16px; border-radius:14px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:.25s; z-index:60}
+    .toast.show{opacity:1}
+
+    @media (max-width: 920px){
+      .setup-grid,.scoreboard,.summary,.modal-actions{grid-template-columns:1fr}
+      .row{grid-template-columns:1fr}
+      .cell-head,.cell{min-height:78px}
+      .cell{font-size:1.7rem}
+      .modal-body,.modal-top,.hero{padding:18px}
+    }
+  </style>
+</head>
+<body>
+  <section id="setup" class="screen">
+    <div class="wrap">
+      <div class="hero">
+        <div class="brand">
+          <div style="font-size:2rem">🏠</div>
+          <div>
+            <h1 class="title">بيت بابا جدو</h1>
+            <p class="sub">نسخة إلكترونية جاهزة للتجربة الليلة مع العائلة — سريعة، حماسية، ومصممة لجلسة تضحك الكبار والصغار.</p>
+          </div>
+        </div>
+
+        <div class="setup-grid">
+          <div class="panel">
+            <h3>إعداد المباراة</h3>
+            <div class="row">
+              <div class="field">
+                <label>اسم الفريق الأول</label>
+                <input id="team1Name" value="الفريق الأحمر" />
+              </div>
+              <div class="field">
+                <label>اسم الفريق الثاني</label>
+                <input id="team2Name" value="الفريق الأزرق" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>مدة التحدي</label>
+                <select id="roundTime">
+                  <option value="30">30 ثانية</option>
+                  <option value="45" selected>45 ثانية</option>
+                  <option value="60">60 ثانية</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>عرض نص التحدي على الشاشة</label>
+                <select id="publicQuestion">
+                  <option value="yes" selected>نعم، الكل يشوفه</option>
+                  <option value="no">لا، للمذيع فقط</option>
+                </select>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn-primary" onclick="startGame()">ابدأ اللعبة الآن</button>
+              <button class="btn-dark" onclick="loadDemo()">عبّيها بإعدادات جاهزة</button>
+            </div>
+            <div class="tiny">نصيحة: شبّكها على التلفزيون وخلك أنت المذيع من اللابتوب أو الجوال.</div>
+          </div>
+
+          <div class="panel">
+            <h3>اختر التصنيفات</h3>
+            <div id="chips" class="chips"></div>
+            <div class="tiny">لازم تختار 4 تصنيفات على الأقل. كل تصنيف فيه 5 تحديات متدرجة.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="game" class="screen hidden">
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand">
+          <div style="font-size:1.9rem">🎉</div>
+          <div>
+            <h2 style="color:var(--gold)">بيت بابا جدو — ليلة التحدي</h2>
+            <div class="meta" id="statusText">ابدأوا من أي خانة… والجو لكم 🔥</div>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="pill" id="remainingPill">الخانات المتبقية: 0</div>
+          <button class="btn-dark" onclick="endGameEarly()">إنهاء المباراة</button>
+          <button class="btn-dark" onclick="resetAll()">إعادة ضبط</button>
+        </div>
+      </div>
+
+      <div class="scoreboard">
+        <div class="team red">
+          <div class="team-head">
+            <div>
+              <h3 id="team1Label">الفريق الأحمر</h3>
+              <div class="meta" id="team1Bonus">فرص السرقة: 2</div>
+            </div>
+            <div id="score1" class="score">0</div>
+          </div>
+        </div>
+        <div class="team blue">
+          <div class="team-head">
+            <div>
+              <h3 id="team2Label">الفريق الأزرق</h3>
+              <div class="meta" id="team2Bonus">فرص السرقة: 2</div>
+            </div>
+            <div id="score2" class="score">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="grid" class="grid"></div>
+    </div>
+  </section>
+
+  <section id="final" class="screen hidden">
+    <div class="wrap final">
+      <div class="winner-card">
+        <div class="big" id="winnerText">الفائز الليلة</div>
+        <div class="winner-score" id="winnerScore"></div>
+        <div class="summary">
+          <div class="panel">
+            <h3>ملخص المباراة</h3>
+            <p id="summaryText" class="sub" style="margin-top:8px"></p>
+          </div>
+          <div class="panel">
+            <h3>اقتراح للجولة الجاية</h3>
+            <p class="sub" style="margin-top:8px">خلّوا الخاسر يسوي تحدي أخير مضحك قدام الكل 😄</p>
+          </div>
+        </div>
+        <div class="actions" style="justify-content:center">
+          <button class="btn-primary" onclick="restartSame()">إعادة بنفس الإعدادات</button>
+          <button class="btn-secondary" onclick="backToSetup()">الرجوع للإعدادات</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="popup">
+    <div class="modal">
+      <div class="modal-top">
+        <div id="doubleLabel" class="flag hidden">🔥 مضاعف النقاط</div>
+        <h2 id="popupTitle">التحدي</h2>
+      </div>
+      <div class="modal-body">
+        <div id="taskText" class="task"></div>
+        <div id="hostOnly" class="hint hidden">هذا التحدي مخصص للمذيع فقط. اقرأه بصوتك أو بطريقتك.</div>
+        <div class="hint" id="taskHint">الفريق الفائز ياخذ النقاط مباشرة. إذا أخفق، تقدر تستخدم زر سرقة للفريق الثاني.</div>
+        <div class="timer-wrap"><div id="timerFill" class="timer-fill"></div></div>
+        <div class="timer-text" id="timerText">الوقت: 45 ثانية</div>
+        <div class="admin-tools">
+          <button class="btn-dark small" onclick="reshuffleTask()">تغيير التحدي</button>
+          <button class="btn-dark small" onclick="toggleTimer()">إيقاف/تشغيل المؤقت</button>
+          <button class="btn-dark small" onclick="closePopupOnly()">إغلاق بدون احتساب</button>
+        </div>
+        <div class="modal-actions">
+          <button class="award red" onclick="award(1)">فاز الفريق 1</button>
+          <button class="award blue" onclick="award(2)">فاز الفريق 2</button>
+          <button class="award green" onclick="stealPrompt()">سرقة للفريق الثاني</button>
+          <button class="award gray" onclick="cancelCell()">لا أحد أخذها</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const DB = {
+      "ألعاب حركية": [
+        {points:100, tasks:["انقل 3 أكواب بدون ما تطيح باستخدام يد وحدة فقط","امشِ خمس خطوات وكتاب فوق راسك بدون ما يطيح","سوِّ هرم من 4 أكواب خلال الوقت"]},
+        {points:200, tasks:["مرر بالون بين أعضاء الفريق بدون استخدام اليدين","حط ملعقة في الفم ووازن عليها كرة خفيفة 5 ثوانٍ","اقفز في مكانك 12 مرة ثم لف وارجع للمكان الصح"]},
+        {points:300, tasks:["انقل 3 أغراض خفيفة لجهة ثانية وأنت ماشي للخلف","كوّنوا شكل نجمة بأجسادكم خلال 10 ثوانٍ","سووا سباق مشية بطريق لمسافة قصيرة داخل المجلس"]},
+        {points:400, tasks:["واحد من الفريق مغمض والآخر يوجهه ليلمس غرض محدد","ابنوا برج أكواب من 6 قطع خلال الوقت","مرروا وسادة بين 4 أشخاص بأسرع وقت بدون ما تطيح"]},
+        {points:500, tasks:["تحدي صامت: نفذ حركة مركبة وعلى الفريق يفهمها خلال 20 ثانية","قف على رجل واحدة وسمِّ 8 أشياء من المطبخ","كوّنوا قطار بشري ودوروا حول أنفسكم ثم ارجعوا لمكانكم"]}
+      ],
+      "تحدي التواصل": [
+        {points:100, tasks:["مثّل كلمة: نخلة","صف دلة بدون ما تقول قهوة ولا شاي","اقرأ على الفريق كلمة: تمر — بحركة الشفايف فقط"]},
+        {points:200, tasks:["مثّل شخصية قهوجي وعلى فريقك يخمن","اوصف خيمة بدون استخدام كلمة بيت أو مجلس","خلك مذيع وعرّف عن مبخرة كأنها منتج فاخر"]},
+        {points:300, tasks:["قلد واحد من العائلة بطريقة محترمة وعلى فريقك يعرفه","اشرح كلمة برقع بإشارات فقط","امدح السجادة كأنها سيارة فخمة"]},
+        {points:400, tasks:["تكلم دقيقة كاملة بنبرة مذيع أخبار عن طبق كبسة","مثّل شعور ضياع الجوال بدون أي كلام","وصف غرض: مفتاح — لكن ممنوع تقول فتح أو باب أو سيارة"]},
+        {points:500, tasks:["مثّل مشهد عزيمة متأخر فيها القهوجي وعلى فريقك يخمن","شرح كلمة عقال بإشارات فقط خلال 15 ثانية","قل قصة قصيرة جدًا فيها: دلة، جمل، نعناع"]}
+      ],
+      "شور الشايب": [
+        {points:100, tasks:["اذكر مثل شعبي مناسب لموقف التأخير","وش أكثر كلمة قديمة تسمعها من الكبار؟","سمِّ 3 أشياء كانت أساسية في المجالس زمان"]},
+        {points:200, tasks:["خمن وش الشيء اللي لو حضر الجد غالبًا يدور عليه أول؟","اذكر 4 عادات جميلة كانت موجودة أول","قل نصيحة يتوقعها الواحد من كبير العائلة"]},
+        {points:300, tasks:["حكوا سالفة قصيرة جدًا تبدأ بـ: أيام أول…","اذكر 5 كلمات شعبية قديمة تعرفها","وش أهم حركة احترام إذا دخل كبير السن المجلس؟"]},
+        {points:400, tasks:["قل مثل شعبي وفسره بطريقتك","اذكر 3 فرق بين عزائم أول وعزائم اليوم","اختر غرض قديم واشرح استخدامه"]},
+        {points:500, tasks:["سوِّ دور حكيم العائلة وأعطِ نصيحة مضحكة لمشكلة حديثة","سمِّ 6 أكلات أو مشروبات مرتبطة بالجلسات القديمة","احكِ ذكرى تتخيل أنها من زمن الأجداد خلال 20 ثانية"]}
+      ],
+      "ألغاز شعبية": [
+        {points:100, tasks:["شيء له أسنان ولا يعض؟","شيء كلما زاد نقص؟","شيء يكتب ولا يقرأ؟"]},
+        {points:200, tasks:["شيء له عين واحدة ولا يرى؟","شيء يمشي بلا رجلين؟","شيء إذا أكل صدق وإذا شرب كذب؟"]},
+        {points:300, tasks:["أمك وأبوك مو خالتك وعمك… من هي؟","شيء إذا ذبحته بكيت عليه؟","وش الشيء اللي قدامك وما تشوفه؟"]},
+        {points:400, tasks:["من هو ابن الماء وإذا وضع فيه مات؟","له رقبة وليس له رأس؟","يمشي ويقف وليس له أرجل؟"]},
+        {points:500, tasks:["أذكر لغز شعبي من عندك ويحلّه فريقك","شيء كل الناس تحتاجه لكن ما يشترونه؟","وش الشيء اللي كل ما أخذت منه كبر؟"]}
+      ],
+      "تحدي السرعة": [
+        {points:100, tasks:["اذكر 5 فواكه خلال 10 ثوانٍ","هات غرض لونه أحمر من المجلس","سمِّ 4 مدن سعودية بسرعة"]},
+        {points:200, tasks:["اذكر 6 أسماء أولاد تبدأ بحرف الميم","هاتوا شيئًا يلمع خلال 10 ثوانٍ","سمِّ 5 أكلات شعبية بسرعة"]},
+        {points:300, tasks:["هاتوا 3 أشياء من المطبخ أو ما يشبهها","اذكر 7 ماركات سيارات","سمِّ 5 كلمات تنتهي بحرف الهاء"]},
+        {points:400, tasks:["اذكر 8 أشياء تبدأ بحرف الباء","هات شيئًا يلبس على الوجه أو الرأس","سمِّ 10 أغراض داخل البيت"]},
+        {points:500, tasks:["اذكر 10 أكلات أو مشروبات خلال 15 ثانية","هاتو 4 أشياء مختلفة القوام واللون","تهجّ كلمة السعودية بالمقلوب"]}
+      ],
+      "ذكريات العائلة": [
+        {points:100, tasks:["من في العائلة غالبًا يتأخر أكثر؟","وش أكثر أكلة تنطلب في العزايم؟","من المشهور بالنوم بدري؟"]},
+        {points:200, tasks:["اذكر 3 أشياء تضحككم دائمًا إذا اجتمعتوا","من أكثر واحد ممكن يضيّع أغراضه؟","وش أكثر جملة تتكرر في الجلسات؟"]},
+        {points:300, tasks:["قلد الموقف المعتاد إذا قرب العشاء","وش أكثر شي يطلبونه الأطفال إذا طفشوا؟","اذكر 5 أسماء موجودة كثير بالعائلة"]},
+        {points:400, tasks:["احكِ موقف عائلي بدون ذكر أسماء والبقية يخمنون","وش أكثر موضوع يفتحونه الكبار؟","وش أكثر شيء يتكرر نسيانه في كل طلعة؟"]},
+        {points:500, tasks:["سوّوا تمثيل لمشهد استقبال ضيوف سريع","كل الفريق يذكر كلمة تصف أحد أفراد العائلة بدون ما يسميه","احكِ ذكرى قصيرة يقدر الجميع يتفق أنها تحصل كثير"]}
+      ]
+    };
+
+    const state = {
+      selectedCats: [], teams:["الفريق الأحمر","الفريق الأزرق"], scores:[0,0], steals:[2,2],
+      roundTime:45, publicQuestion:true, board:[], current:null, timer:null, timeLeft:45, paused:false,
+      usedTasks:{}, dailyIndex:-1, finished:false
+    };
+
+    const chipsWrap = document.getElementById('chips');
+    Object.keys(DB).forEach(cat=>{
+      const el=document.createElement('div');
+      el.className='chip active'; el.textContent=cat;
+      el.onclick=()=>{ el.classList.toggle('active'); };
+      chipsWrap.appendChild(el);
+    });
+
+    function loadDemo(){
+      document.getElementById('team1Name').value='فريق الكبار';
+      document.getElementById('team2Name').value='فريق الشباب';
+      document.getElementById('roundTime').value='45';
+      document.getElementById('publicQuestion').value='yes';
+      toast('جهزتها لك — اضغط ابدأ اللعبة الآن');
+    }
+
+    function startGame(){
+      const selected = [...document.querySelectorAll('.chip.active')].map(x=>x.textContent);
+      if(selected.length < 4){ alert('اختر 4 تصنيفات على الأقل'); return; }
+      state.selectedCats = selected.slice(0,5);
+      state.teams = [document.getElementById('team1Name').value.trim() || 'الفريق الأحمر', document.getElementById('team2Name').value.trim() || 'الفريق الأزرق'];
+      state.roundTime = Number(document.getElementById('roundTime').value || 45);
+      state.publicQuestion = document.getElementById('publicQuestion').value === 'yes';
+      state.scores = [0,0];
+      state.steals = [2,2];
+      state.usedTasks = {};
+      state.finished = false;
+      buildBoard();
+      syncLabels();
+      document.getElementById('setup').classList.add('hidden');
+      document.getElementById('final').classList.add('hidden');
+      document.getElementById('game').classList.remove('hidden');
+      renderBoard();
+      saveState();
+      toast('بدأت المباراة 🔥');
+    }
+
+    function buildBoard(){
+      state.board = [];
+      state.selectedCats.forEach(cat=>{
+        DB[cat].forEach((item, level)=>{
+          state.board.push({cat, points:item.points, level, done:false});
+        });
+      });
+      state.dailyIndex = Math.floor(Math.random()*state.board.length);
+    }
+
+    function renderBoard(){
+      const grid=document.getElementById('grid');
+      grid.innerHTML='';
+      grid.style.gridTemplateColumns=`repeat(${state.selectedCats.length}, 1fr)`;
+      state.selectedCats.forEach(cat=>{
+        const h=document.createElement('div'); h.className='cell-head'; h.textContent=cat; grid.appendChild(h);
+      });
+      for(let row=0; row<5; row++){
+        for(let c=0; c<state.selectedCats.length; c++){
+          const cat = state.selectedCats[c];
+          const idx = state.board.findIndex(x=>x.cat===cat && x.level===row);
+          const cellData = state.board[idx];
+          const cell=document.createElement('div');
+          cell.className='cell' + (idx===state.dailyIndex && !cellData.done ? ' daily':'') + (cellData.done ? ' done':'');
+          cell.textContent = cellData.done ? '✔' : cellData.points;
+          cell.onclick=()=>openCell(idx);
+          grid.appendChild(cell);
+        }
+      }
+      updateMeta();
+    }
+
+    function syncLabels(){
+      document.getElementById('team1Label').textContent=state.teams[0];
+      document.getElementById('team2Label').textContent=state.teams[1];
+      document.getElementById('score1').textContent=state.scores[0];
+      document.getElementById('score2').textContent=state.scores[1];
+      document.getElementById('team1Bonus').textContent=`فرص السرقة: ${state.steals[0]}`;
+      document.getElementById('team2Bonus').textContent=`فرص السرقة: ${state.steals[1]}`;
+    }
+
+    function updateMeta(){
+      syncLabels();
+      const rem = state.board.filter(x=>!x.done).length;
+      document.getElementById('remainingPill').textContent = `الخانات المتبقية: ${rem}`;
+      if(rem===0 && !state.finished) endGame();
+    }
+
+    function openCell(idx){
+      const data = state.board[idx];
+      if(!data || data.done || state.finished) return;
+      state.current = { idx, cat:data.cat, basePoints:data.points, points:(idx===state.dailyIndex ? data.points*2 : data.points), level:data.level, task:'' };
+      document.getElementById('popupTitle').textContent = `${data.cat} — ${state.current.points} نقطة`;
+      document.getElementById('doubleLabel').classList.toggle('hidden', idx!==state.dailyIndex);
+      document.getElementById('hostOnly').classList.toggle('hidden', state.publicQuestion);
+      reshuffleTask(true);
+      document.getElementById('popup').style.display='flex';
+      startTimer(state.roundTime);
+      document.getElementById('statusText').textContent = 'التحدي مفتوح… شدوا حيلكم 👀';
+    }
+
+    function taskPoolKey(){ return `${state.current.cat}_${state.current.level}`; }
+
+    function reshuffleTask(first=false){
+      const levelData = DB[state.current.cat][state.current.level].tasks;
+      const key = taskPoolKey();
+      if(!state.usedTasks[key]) state.usedTasks[key] = [];
+      const used = state.usedTasks[key];
+      let available = levelData.filter(t=>!used.includes(t));
+      if(available.length===0){ state.usedTasks[key]=[]; available=[...levelData]; }
+      const pick = available[Math.floor(Math.random()*available.length)];
+      state.current.task = pick;
+      state.usedTasks[key].push(pick);
+      document.getElementById('taskText').textContent = state.publicQuestion ? pick : 'التحدي مخفي عن اللاعبين';
+      if(!first) toast('تم تغيير التحدي');
+      saveState();
+    }
+
+    function startTimer(seconds){
+      clearInterval(state.timer);
+      state.timeLeft = seconds;
+      state.paused = false;
+      paintTimer();
+      state.timer = setInterval(()=>{
+        if(state.paused) return;
+        state.timeLeft--;
+        paintTimer();
+        if(state.timeLeft<=0){
+          clearInterval(state.timer);
+          document.getElementById('statusText').textContent='انتهى الوقت ⏰';
+          toast('انتهى الوقت! تقدر تحسب سرقة أو تلغي الخانة');
+        }
+      },1000);
+    }
+
+    function paintTimer(){
+      const pct = Math.max(0,(state.timeLeft/state.roundTime)*100);
+      document.getElementById('timerFill').style.width = pct + '%';
+      document.getElementById('timerText').textContent = `الوقت: ${state.timeLeft} ثانية`;
+    }
+
+    function toggleTimer(){ state.paused=!state.paused; toast(state.paused ? 'تم إيقاف المؤقت' : 'تم تشغيل المؤقت'); }
+
+    function award(team){
+      if(!state.current) return;
+      state.scores[team-1]+=state.current.points;
+      finishCell(`${state.teams[team-1]} أخذ ${state.current.points} نقطة`);
+    }
+
+    function cancelCell(){ if(!state.current) return; finishCell('تم إلغاء الخانة'); }
+
+    function stealPrompt(){
+      if(!state.current) return;
+      const lastTeam = confirm(`اضغط موافق إذا السرقة للفريق الأول (${state.teams[0]})\nواضغط إلغاء إذا السرقة للفريق الثاني (${state.teams[1]})`)?1:2;
+      if(state.steals[lastTeam-1] <= 0){ toast('هذا الفريق استهلك كل فرص السرقة'); return; }
+      state.steals[lastTeam-1] -= 1;
+      const stolen = Math.ceil(state.current.points * 0.8);
+      state.scores[lastTeam-1] += stolen;
+      finishCell(`${state.teams[lastTeam-1]} سرق ${stolen} نقطة`);
+    }
+
+    function finishCell(status){
+      clearInterval(state.timer);
+      state.board[state.current.idx].done = true;
+      document.getElementById('popup').style.display='none';
+      document.getElementById('statusText').textContent = status;
+      state.current = null;
+      renderBoard();
+      saveState();
+    }
+
+    function closePopupOnly(){ clearInterval(state.timer); document.getElementById('popup').style.display='none'; document.getElementById('statusText').textContent='أغلقتم التحدي بدون احتساب'; }
+
+    function endGameEarly(){ if(confirm('متأكد تبغى تنهي المباراة الآن؟')) endGame(); }
+
+    function endGame(){
+      state.finished = true;
+      clearInterval(state.timer);
+      document.getElementById('game').classList.add('hidden');
+      document.getElementById('final').classList.remove('hidden');
+      const [a,b] = state.scores;
+      let title='تعادل عائلي جميل 😄';
+      if(a>b) title=`🏆 الفائز: ${state.teams[0]}`;
+      if(b>a) title=`🏆 الفائز: ${state.teams[1]}`;
+      document.getElementById('winnerText').textContent=title;
+      document.getElementById('winnerScore').textContent=`${state.teams[0]}: ${a} | ${state.teams[1]}: ${b}`;
+      const played = state.board.filter(x=>x.done).length;
+      document.getElementById('summaryText').textContent=`انلعبت ${played} خانات من أصل ${state.board.length}. فرق السرقة المتبقية — ${state.teams[0]}: ${state.steals[0]}، ${state.teams[1]}: ${state.steals[1]}.`;
+      saveState();
+    }
+
+    function restartSame(){
+      state.scores=[0,0]; state.steals=[2,2]; state.usedTasks={}; state.finished=false;
+      buildBoard(); renderBoard();
+      document.getElementById('final').classList.add('hidden');
+      document.getElementById('game').classList.remove('hidden');
+      document.getElementById('statusText').textContent='جولة جديدة بدأت 🔁';
+      saveState();
+    }
+
+    function backToSetup(){
+      clearInterval(state.timer);
+      document.getElementById('final').classList.add('hidden');
+      document.getElementById('game').classList.add('hidden');
+      document.getElementById('setup').classList.remove('hidden');
+    }
+
+    function resetAll(){ if(confirm('بتصفّر كل شيء. متأكد؟')){ localStorage.removeItem('baitbaba_state_v1'); location.reload(); } }
+
+    function saveState(){
+      const safe = JSON.stringify({
+        selectedCats:state.selectedCats, teams:state.teams, scores:state.scores, steals:state.steals,
+        roundTime:state.roundTime, publicQuestion:state.publicQuestion, board:state.board,
+        usedTasks:state.usedTasks, dailyIndex:state.dailyIndex, finished:state.finished
+      });
+      localStorage.setItem('baitbaba_state_v1', safe);
+    }
+
+    function restoreState(){
+      const raw = localStorage.getItem('baitbaba_state_v1');
+      if(!raw) return;
+      try{
+        const saved = JSON.parse(raw);
+        Object.assign(state, saved);
+        if(!state.selectedCats || !state.selectedCats.length) return;
+        document.getElementById('team1Name').value = state.teams[0] || 'الفريق الأحمر';
+        document.getElementById('team2Name').value = state.teams[1] || 'الفريق الأزرق';
+        document.getElementById('roundTime').value = String(state.roundTime || 45);
+        document.getElementById('publicQuestion').value = state.publicQuestion ? 'yes':'no';
+        [...document.querySelectorAll('.chip')].forEach(ch=>ch.classList.toggle('active', state.selectedCats.includes(ch.textContent)));
+        if(saved.board && saved.board.length){
+          document.getElementById('setup').classList.add('hidden');
+          document.getElementById('game').classList.remove('hidden');
+          renderBoard();
+          syncLabels();
+          document.getElementById('statusText').textContent='تم استرجاع آخر مباراة تلقائيًا';
+          toast('رجّعت لك آخر مباراة');
+        }
+      }catch(e){ console.warn(e); }
+    }
+
+    function toast(msg){
+      const t=document.getElementById('toast');
+      t.textContent=msg; t.classList.add('show');
+      clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+    }
+
+    restoreState();
+  </script>
+</body>
+</html>
